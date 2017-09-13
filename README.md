@@ -1,2 +1,2 @@
 # zero-shot-style-transfer
-Implementation of A Series of Zero-Shot Style Transfer Methods
+Implementation of various popular zero-shot style transfer methods
