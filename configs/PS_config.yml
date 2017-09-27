@@ -1,0 +1,25 @@
+# name of the applied model
+model_name: 'PS'
+
+# data preparation for the network training and testing
+# the input of the network architecture
+default_size: 256
+content_size: 512
+style_size: 512
+
+# perceptual loss config
+network_name: 'vgg_16'
+checkpoint_path: '/DATA/lsheng/model_zoo/VGG/vgg_16.ckpt'
+checkpoint_exclude_scopes: 'vgg_16/fc'
+ignore_missing_vars: True
+
+# style loss layers
+style_loss_layers:
+  - 'conv1/conv1_1'
+  - 'conv2/conv2_1'
+  - 'conv3/conv3_1'
+  - 'conv4/conv4_1'
+  - 'conv5/conv5_1'
+
+# patch size
+patch_size: 3
