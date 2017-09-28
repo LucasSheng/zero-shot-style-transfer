@@ -22,5 +22,4 @@ style_loss_layers:
   - 'conv5/conv5_1'
 
 # additional arguments
-is_unbiased_transform: True
 blending_weight: 0.5

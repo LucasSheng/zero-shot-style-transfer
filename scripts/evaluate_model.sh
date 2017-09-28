@@ -1,20 +1,18 @@
 #!/usr/bin/env bash
 
 MODEL_TYPE=$1
-STYLE_DATASET_NAME=$2
-CUDA_ID=$3
+CUDA_ID=$2
 
-# dataset paths
+# dataset paths, both content and style images are not trasferred to tfexample
 CONTENT_DATASET_DIR=/DATA/lsheng/lsheng_data/contents_for_style_transfer
-STYLE_DATASET_DIR=/DATA/lsheng/lsheng_data/${STYLE_DATASET_NAME}
+STYLE_DATASET_DIR=/DATA/lsheng/lsheng_data/source_dataset/simple
 
 # configuration files
 CONFIG_DIR=/home/lsheng/lsheng_models/zero-shot-style-transfer/configs
 
 # model storage files
-MODEL_DIR=/DATA/lsheng/lsheng_model_checkpoints/zero-shot-style-transfer/${MODEL_TYPE}
-TRAIN_DIR=${MODEL_DIR}/train
-EVAL_DIR=${MODEL_DIR}/evaluation
+TRAIN_DIR=/DATA/lsheng/lsheng_model_checkpoints/zero-shot-style-transfer/AE/train
+EVAL_DIR=/DATA/lsheng/lsheng_model_checkpoints/zero-shot-style-transfer/${MODEL_TYPE}/evaluation
 
 CUDA_VISIBLE_DEVICES=${CUDA_ID} \
     python evaluate_model.py \

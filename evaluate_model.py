@@ -68,13 +68,14 @@ def main(_):
 
         # preprocess the content and style images
         content_image = preprocessing.preprocessing_image(
-            inp_content_image, 448, 448)
+            inp_content_image, 448, 448, resize_side=512, is_training=False)
         content_image = tf.expand_dims(content_image, axis=0)
-        style_image = preprocessing.preprocessing_image(inp_style_image, 448, 448)
+        style_image = preprocessing.preprocessing_image(
+            inp_style_image, 448, 448, resize_side=512, is_training=False)
         style_image = tf.expand_dims(style_image, axis=0)
 
         # style transfer
-        stylized_image, _ = style_model.style_transfer(content_image, style_image)
+        stylized_image = style_model.style_transfer(content_image, style_image)
         stylized_image = tf.squeeze(stylized_image, axis=0)
 
         # gather the test image filenames and style image filenames

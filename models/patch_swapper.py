@@ -19,8 +19,6 @@ network_map = {
 
 class PatchSwapper(object):
     def __init__(self, options):
-        self.weight_decay = options.get('weight_decay')
-
         self.default_size = options.get('default_size')
         self.content_size = options.get('content_size')
         self.style_size = options.get('style_size')
@@ -61,7 +59,6 @@ class PatchSwapper(object):
         # input preprocessing
         outputs = tf.identity(inputs)
         # start style transfer
-        intermediate_results = []
         num_modules = len(selected_style_layers)
         for i in range(num_modules, 0, -1):
             starting_layer = selected_style_layers[i-1]
@@ -76,16 +73,15 @@ class PatchSwapper(object):
                 styles_features[starting_layer],
                 patch_size=self.patch_size)
             # decoding the contents
-            with slim.arg_scope(vgg_decoder.vgg_decoder_arg_scope(self.weight_decay)):
+            with slim.arg_scope(vgg_decoder.vgg_decoder_arg_scope()):
                 outputs = vgg_decoder.vgg_decoder(
                     transformed_features, self.network_name, starting_layer,
-                    reuse=True, scope='decoder_%d' % style_layers[i-1])
-            intermediate_results.append(outputs)
+                    scope='decoder_%d' % style_layers[i-1])
             outputs = preprocessing.batch_mean_image_subtraction(outputs)
             print('Finish the module of [%s]' % starting_layer)
 
         # recover the outputs
-        return preprocessing.batch_mean_image_summation(outputs), intermediate_results
+        return preprocessing.batch_mean_image_summation(outputs)
 
 
 def feature_transform(content_features, style_features, patch_size=3):
