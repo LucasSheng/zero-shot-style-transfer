@@ -12,7 +12,7 @@ import tensorflow as tf
 from datasets import dataset_utils
 
 # number of shards per dataset split
-_NUM_SHARDS = 10
+_NUM_SHARDS = 32
 
 # seed for repeatability
 _RANDOM_SEED = 0
@@ -75,7 +75,8 @@ def _convert_dataset(split_name, image_filenames):
     num_per_shard = int(math.ceil(len(image_filenames) / float(FLAGS.num_shards)))
 
     with tf.Graph().as_default():
-        image_reader = dataset_utils.ImageReader()
+        # image_reader = dataset_utils.ImageReader()
+        image_reader = dataset_utils.ImageCoder()
         with tf.Session('') as sess:
             for shard_id in range(FLAGS.num_shards):
                 output_filename = _get_dataset_filename(split_name, shard_id)
@@ -89,14 +90,10 @@ def _convert_dataset(split_name, image_filenames):
                         # read the image
                         img_filename = image_filenames[i]
                         img_data = tf.gfile.FastGFile(img_filename, 'r').read()
-                        # check whether the file is valid
-                        try:
-                            img_shape = image_reader.read_image_dims(sess, img_data)
-                        except BaseException:
-                            continue
-                        else:
+                        img_status, img_data, img_shape = image_reader.decode_image(sess, img_data)
+                        if img_status and img_data is not None:
                             example = dataset_utils.image_to_tfexample(
-                                img_data, img_filename[-3:], img_shape, img_filename)
+                                img_data, 'jpg', img_shape, img_filename)
                             tfrecord_writer.write(example.SerializeToString())
     sys.stdout.write('\n')
     sys.stdout.flush()

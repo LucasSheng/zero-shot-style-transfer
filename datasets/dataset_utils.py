@@ -111,7 +111,7 @@ class ImageReader(object):
     """helper class that provides tensorflow image coding utilities."""
     def __init__(self):
         self._decode_data = tf.placeholder(dtype=tf.string)
-        self._decode_image = tf.image.decode_image(self._decode_data, channels=3)
+        self._decode_image = tf.image.decode_image(self._decode_data, channels=0)
 
     def read_image_dims(self, sess, image_data):
         image = self.decode_image(sess, image_data)
@@ -123,3 +123,29 @@ class ImageReader(object):
         assert len(image.shape) == 3
         assert image.shape[2] == 3
         return image
+
+
+class ImageCoder(object):
+    """helper class that provides Tensorflow Image coding utilities,
+    also works for corrupted data with incorrected extension"""
+    def __init__(self):
+        self._decode_data = tf.placeholder(dtype=tf.string)
+        self._decode_image = tf.image.decode_image(self._decode_data, channels=0)
+        self._encode_jpeg = tf.image.encode_jpeg(self._decode_image, format='rgb', quality=100)
+
+    def decode_image(self, sess, image_data):
+        # verify the image from the image_data
+        status = False
+        try:
+            # decode image and verify the data
+            image = sess.run(self._decode_image,
+                             feed_dict={self._decode_data: image_data})
+            image_shape = image.shape
+            assert len(image_shape) == 3
+            assert image_shape[2] == 3
+            # encode as RGB JPEG image string and return
+            image_string = sess.run(self._encode_jpeg, feed_dict={self._decode_data: image_data})
+            status = True
+        except BaseException:
+            image_shape, image_string = None, None
+        return status, image_string, image_shape
